@@ -11,7 +11,8 @@ export default function TodoList() {
   const fetchTodos = async () => {
     const { data: items } = await client.models.Todo.list({
         filter: {
-            reference: {
+            // Change field to test different types
+            inlineType: {
                 attributeExists: false
             }
         }
@@ -20,7 +21,8 @@ export default function TodoList() {
 
     const { data: items2 } = await client.models.Todo.list({
         filter: {
-            reference: {
+            // Change field to test different types
+            inlineType: {
                 attributeExists: true
             }
         }
@@ -37,7 +39,14 @@ export default function TodoList() {
     const needsReference =  Math.random() > 0.5
     await client.models.Todo.create({
       content: window.prompt("Todo content?"),
-      ...(needsReference ? {reference: randomString} : {})
+      // Generate todos with and without these fields randomly
+      ...(needsReference ? {
+        reference: randomString,
+        inlineEnum: 'test3',
+        inlineType: { type: 'test' },
+        refEnum: 'test2',
+        refType: { test: 'testing' },
+    } : {})
     });
 
     fetchTodos();
@@ -47,7 +56,7 @@ export default function TodoList() {
     <div>
       <button onClick={createTodo}>Add new todo</button>
       <div>
-        <h2>Todo without Ref:</h2>
+        <h2>Todo without:</h2>
         <ul>
             {refTodos.map(({ id, content, reference }) => (
             <li key={id}>{content} ({reference})</li>
@@ -55,7 +64,7 @@ export default function TodoList() {
         </ul>
       </div>
       <div>
-        <h2>Todo with Ref:</h2>
+        <h2>Todo with:</h2>
         <ul>
             {todos.map(({ id, content, reference }) => (
             <li key={id}>{content} ({reference})</li>
